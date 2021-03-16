@@ -1,0 +1,7 @@
+.idea
+*.log
+*.pyc
+workspace.xml
+classroom_app/__pycache__/*
+ClassroomEnrollment/__pycache__/*
+__pycache__/*
