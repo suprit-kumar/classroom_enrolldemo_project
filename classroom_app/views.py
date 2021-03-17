@@ -1,4 +1,4 @@
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 import re
@@ -25,9 +25,8 @@ def login_operation(request):
                                                          status__iexact='active')
                 if validate_user is not None:
                     request.session['usercode'] = validate_user.user_code
-                    response_msg = {"result": "success", 'u_type': validate_user.role_id.role_code,
+                    response_msg = {"result": "success", 'u_type': validate_user.role_id.role_name,
                                     'u_code': validate_user.user_code}
-                    print(response_msg)
                 else:
                     response_msg = {"result": "failed", "msg": "Invalid User credentials"}
             except models.Users.DoesNotExist:
@@ -38,6 +37,62 @@ def login_operation(request):
     except Exception as e:
         print("Exception in login_operation views.py-->", e)
         return JsonResponse({"result": "error", "msg": "Opps!, Server error while login"})
+
+
+def logout(request):
+    try:
+        # Remove the authenticated user's ID from the request and flush their session data.Add details to UserLogs table.
+        if 'usercode' in request.session:
+            user_code = request.session['usercode']
+            print('LOGOUT - ---- > ', user_code)
+            request.session.flush()
+        return HttpResponseRedirect('/')
+    except Exception as e:
+        print('Exception in logout --> ', e)
+        request.session.flush()
+        return HttpResponseRedirect('/')
+
+
+def admin_dashboard(request):
+    try:
+        if 'usercode' in request.session:
+            user_code = request.session['usercode']
+            user_details = list(
+                models.Users.objects.filter(user_code=user_code).values('name', 'useremail'))
+            return render(request, 'admin_dashboard.html',
+                          {'user_code': user_code, 'details': user_details, 'type': 'ADMIN'})
+    except Exception as e:
+        print('Exception in rendering admin_dashboard --> ', e)
+        request.session.flush()
+        return HttpResponseRedirect('/')
+
+
+def teacher_dashboard(request):
+    try:
+        if 'usercode' in request.session:
+            user_code = request.session['usercode']
+            user_details = list(
+                models.Users.objects.filter(user_code=user_code).values('name', 'useremail'))
+            return render(request, 'teacher_dashboard.html',
+                          {'user_code': user_code, 'details': user_details, 'type': 'TEACHER'})
+    except Exception as e:
+        print('Exception in rendering admin_dashboard --> ', e)
+        request.session.flush()
+        return HttpResponseRedirect('/')
+
+
+def student_dashboard(request):
+    try:
+        if 'usercode' in request.session:
+            user_code = request.session['usercode']
+            user_details = list(
+                models.Users.objects.filter(user_code=user_code).values('name', 'useremail'))
+            return render(request, 'student_dashboard.html',
+                          {'user_code': user_code, 'details': user_details, 'type': 'STUDENT'})
+    except Exception as e:
+        print('Exception in rendering admin_dashboard --> ', e)
+        request.session.flush()
+        return HttpResponseRedirect('/')
 
 
 @csrf_exempt
@@ -64,15 +119,16 @@ def register_new_user(request):
                             models.Users.objects.create(user_code=u_code, name=name, useremail=email,
                                                         password=encrypt_password(password),
                                                         role_id=models.Role.objects.get(role_name=user_type))
-                            return JsonResponse({'result':'success','msg':'Registered Successfully'})
+                            return JsonResponse({'result': 'success', 'msg': 'Registered Successfully'})
                         except Exception as e:
                             models.Teacher.objects.filter(usercode=u_code).delete()
                             models.Student.objects.filter(usercode=u_code).delete()
-                            print("Exception in user creation -->",e)
+                            print("Exception in user creation -->", e)
                 else:
-                    return JsonResponse({'result':'email_exist','msg':'This email id already registered! Try with another'})
+                    return JsonResponse(
+                        {'result': 'email_exist', 'msg': 'This email id already registered! Try with another'})
             else:
-                return JsonResponse({'result':'invalid_request','msg':'Invalid request! Try again'})
+                return JsonResponse({'result': 'invalid_request', 'msg': 'Invalid request! Try again'})
 
     except Exception as e:
         print("Exception in register_new_user views.py-->", e)

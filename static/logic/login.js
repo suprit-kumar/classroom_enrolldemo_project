@@ -63,9 +63,11 @@ function checkuser(useremail, password) {
 
 function gotoRespectiveLogin(user_code, user_type) {
     if (user_type === 'Teacher') {
-        window.location.href = '/superadmin_dashboard/';
+        window.location.href = '/teacher_dashboard/';
     } else if (user_type === 'Student') {
-        window.location.href = '/kycadmin_dashboard/';
+        window.location.href = '/student_dashboard/';
+    } else if (user_type === 'Admin') {
+        window.location.href = '/admin_dashboard/';
     }
 }
 

@@ -17,9 +17,13 @@ from django.contrib import admin
 from django.urls import path
 from classroom_app import views
 
-
 urlpatterns = [
     # path('admin/', admin.site.urls),
     path('', views.loginHtml, name='loginHtml'),
+    path('admin_dashboard/', views.admin_dashboard, name='admin_dashboard'),
+    path('teacher_dashboard/', views.teacher_dashboard, name='teacher_dashboard'),
+    path('student_dashboard/', views.student_dashboard, name='student_dashboard'),
+    path('login_operation/', views.login_operation, name='login_operation'),
+    path('logout/', views.logout, name='logout'),
     path('register_new_user/', views.register_new_user, name='register_new_user'),
 ]

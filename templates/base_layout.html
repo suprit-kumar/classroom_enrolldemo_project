@@ -1,0 +1,79 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Dashboard</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="all,follow">
+    <!-- Bootstrap CSS-->
+    <link rel="stylesheet" href="{% static 'dashboardStyles/vendor/bootstrap/css/bootstrap.min.css' %}">
+    <!-- Font Awesome CSS-->
+    <link rel="stylesheet" href="{% static 'dashboardStyles/vendor/font-awesome/css/font-awesome.min.css' %}">
+    <!-- Fontastic Custom icon font-->
+    <link rel="stylesheet" href="{% static 'dashboardStyles/css/fontastic.css' %}">
+    <!-- Google fonts - Roboto -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700">
+    <!-- jQuery Circle-->
+    <link rel="stylesheet" href="{% static 'dashboardStyles/css/grasp_mobile_progress_circle-1.0.0.min.css' %}">
+    <!-- Custom Scrollbar-->
+    <link rel="stylesheet"
+          href="{% static 'dashboardStyles/vendor/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.css' %}">
+    <!-- theme stylesheet-->
+    <link rel="stylesheet" href="{% static 'dashboardStyles/css/style.default.css' %}" id="theme-stylesheet">
+    <!-- Custom stylesheet - for your changes-->
+    <link rel="stylesheet" href="{% static 'dashboardStyles/css/custom.css' %}">
+    <title>{% block title %}{% endblock %} </title>
+    {% block hscripts %}
+
+    {% endblock %}
+</head>
+<body>
+<!-- Side Navbar -->
+<nav class="side-navbar">
+    <div class="side-navbar-wrapper">
+        <div class="sidenav-header d-flex align-items-center justify-content-center">
+            <div class="sidenav-header-inner text-center">
+                <h5>{{ details.0.name }}</h5><span style="color: white">{{ type }}</span>
+            </div>
+        </div>
+        <div class="main-menu">
+            <h5 class="sidenav-heading">Menu</h5>
+            <ul id="side-main-menu" class="side-menu list-unstyled">
+                <li><a href="javascript:void(0)">Home </a></li>
+                <li><a href="{% url 'logout' %}">Logout </a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<div class="page">
+    <header class="header">
+        <nav class="navbar">
+            <div class="container-fluid">
+                <div class="navbar-holder d-flex align-items-center justify-content-between">
+                    <div class="navbar-header"><a id="toggle-btn" href="#" class="menu-btn"><i
+                            class="icon-bars"> </i></a><a href="base_layout.html" class="navbar-brand">
+                        <div class="brand-text d-none d-md-inline-block"><strong
+                                class="text-primary">{{ type }} Dashboard</strong></div>
+                    </a></div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    {% block content %}  {% endblock %}
+</div>
+<!-- JavaScript files-->
+<script src="{% static 'dashboardStyles/vendor/jquery/jquery.min.js' %}"></script>
+<script src="{% static 'dashboardStyles/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+<script src="{% static 'dashboardStyles/js/grasp_mobile_progress_circle-1.0.0.min.js' %}"></script>
+<script src="{% static 'dashboardStyles/vendor/jquery.cookie/jquery.cookie.js' %}"></script>
+<script src="{% static 'dashboardStyles/vendor/chart.js/Chart.min.js' %}"></script>
+<script src="{% static 'dashboardStyles/vendor/jquery-validation/jquery.validate.min.js' %}"></script>
+<script src="{% static 'dashboardStyles/vendor/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.concat.min.js' %}"></script>
+{% block fscripts %}
+{% endblock %}
+</body>
+</html>
