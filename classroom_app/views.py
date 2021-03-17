@@ -133,3 +133,42 @@ def register_new_user(request):
     except Exception as e:
         print("Exception in register_new_user views.py-->", e)
         return JsonResponse({'result': 'failed', 'msg': 'Failed to register! Try after sometimes'})
+
+
+@csrf_exempt
+def save_class_details(request):
+    try:
+        if 'usercode' in request.session:
+            usercode = request.session['usercode']
+            if request.method == 'POST':
+                className = request.POST['className']
+                classSubject = request.POST['classSubject']
+                classDate = request.POST['classDate']
+                classTime = request.POST['classTime']
+
+                if className != '' and classSubject != '' and classDate != '' and classTime != '':
+                    models.Classes.objects.create(class_name=className, class_subject=classSubject,
+                                                  class_date=classDate, class_time=classTime,
+                                                  teacher_id=models.Teacher.objects.get(usercode=usercode))
+                    return JsonResponse({'result': 'success', 'msg': 'Class Created Successfully'})
+                else:
+                    return JsonResponse({'result': 'invalid_request', 'msg': 'Invalid request! Try again'})
+    except Exception as e:
+        print("Exception in save_class_details views.py-->", e)
+        return JsonResponse({'result': 'failed', 'msg': 'Failed to save class details! Try after sometimes'})
+
+
+@csrf_exempt
+def fetch_class_details(request):
+    try:
+        if 'usercode' in request.session:
+            usercode = request.session['usercode']
+            if request.method == 'POST':
+                teacher_obj = models.Teacher.objects.get(usercode=usercode)
+                cls_details = list(
+                    models.Classes.objects.values('class_name', 'class_subject', 'class_date', 'class_time',
+                                                  'number_of_students').filter(teacher_id=teacher_obj.teacher_id))
+                return JsonResponse({'result': 'success', 'cls_details': cls_details})
+    except Exception as e:
+        print("Exception in fetch_class_details views.py-->", e)
+        return JsonResponse({'result': 'failed', 'msg': 'Failed to load class details! Refresh the page'})

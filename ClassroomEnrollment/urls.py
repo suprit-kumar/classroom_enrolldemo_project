@@ -26,4 +26,6 @@ urlpatterns = [
     path('login_operation/', views.login_operation, name='login_operation'),
     path('logout/', views.logout, name='logout'),
     path('register_new_user/', views.register_new_user, name='register_new_user'),
+    path('save_class_details/', views.save_class_details, name='save_class_details'),
+    path('fetch_class_details/', views.fetch_class_details, name='fetch_class_details'),
 ]

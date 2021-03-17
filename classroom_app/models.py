@@ -36,7 +36,7 @@ class Classes(models.Model):
     class_subject = models.CharField(max_length=50, null=True, default="")
     class_date = models.CharField(max_length=50, null=True, default="")
     class_time = models.CharField(max_length=50, null=True, default="")
-    number_of_students = models.CharField(max_length=50, null=True, default="")
+    number_of_students = models.CharField(max_length=50, null=True, default=0)
     teacher_id = models.ForeignKey(Teacher, on_delete=models.CASCADE)
 
     class Meta:
