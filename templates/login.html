@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="{% static 'bootstrap_plugins/css_plugins/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/login_page.css' %}">
+</head>
+<body>
+
+
+<div class="global-container">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card login-form">
+                <div class="card-body">
+                    <h3 class="card-title text-center">Register</h3>
+                    <div class="card-text">
+
+                        <form action="javascript:void(0)">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label for="reg_email_input">Type</label>
+                                <select class="form-control" id="select_registration_type">
+                                    <option value="">Select Type</option>
+                                    <option value="Teacher">Teacher</option>
+                                    <option value="Student">Student</option>
+                                </select>
+                            </div>
+                             <div class="form-group">
+                                <label for="reg_name_input">Name</label>
+                                <input type="text" class="form-control form-control-sm" id="reg_name_input">
+                            </div>
+                            <div class="form-group">
+                                <label for="reg_email_input">Email address</label>
+                                <input type="email" class="form-control form-control-sm" id="reg_email_input"
+                                       onpaste="return false;" ondrop="return false;" autocomplete="off"
+                                       aria-describedby="emailHelp">
+                            </div>
+                            <div class="form-group">
+                                <label for="reg_pwd_input">Password</label>
+                                <input type="password" class="form-control form-control-sm" id="reg_pwd_input"
+                                       onpaste="return false;" ondrop="return false;" autocomplete="off">
+                            </div>
+                            <button id="new_regBtn" class="btn btn-primary btn-block">Register<i class="login-spin"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card login-form">
+                <div class="card-body">
+                    <h3 class="card-title text-center">Login</h3>
+                    <div class="card-text">
+
+                        <form action="javascript:void(0)">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label for="email_input">Email address</label>
+                                <input type="email" class="form-control form-control-sm" id="email_input"
+                                       onpaste="return false;" ondrop="return false;" autocomplete="off"
+                                       aria-describedby="emailHelp">
+                            </div>
+                            <div class="form-group">
+                                <label for="pwd_input">Password</label>
+                                <input type="password" class="form-control form-control-sm" id="pwd_input"
+                                       onpaste="return false;" ondrop="return false;" autocomplete="off">
+                            </div>
+                            <button id="signInBtn" class="btn btn-primary btn-block">Login<i class="login-spin"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="{% static 'bootstrap_plugins/js_plugins/sweetalert.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'logic/login.js' %}"></script>
+
+</body>
+</html>

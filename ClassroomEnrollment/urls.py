@@ -15,7 +15,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from classroom_app import views
+
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    # path('admin/', admin.site.urls),
+    path('', views.loginHtml, name='loginHtml'),
+    path('register_new_user/', views.register_new_user, name='register_new_user'),
 ]
