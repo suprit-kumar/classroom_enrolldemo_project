@@ -28,4 +28,7 @@ urlpatterns = [
     path('register_new_user/', views.register_new_user, name='register_new_user'),
     path('save_class_details/', views.save_class_details, name='save_class_details'),
     path('fetch_class_details/', views.fetch_class_details, name='fetch_class_details'),
+    path('fetch_all_class_details/', views.fetch_all_class_details, name='fetch_all_class_details'),
+    path('enroll_class/', views.enroll_class, name='enroll_class'),
+    path('fetch_my_enrolled_classes/', views.fetch_my_enrolled_classes, name='fetch_my_enrolled_classes'),
 ]

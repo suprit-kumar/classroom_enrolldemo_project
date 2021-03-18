@@ -2,7 +2,7 @@ from django.http import JsonResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 import re
-
+from django.db.models import F
 from classroom_app import models
 from classroom_app.utils import *
 
@@ -119,6 +119,16 @@ def register_new_user(request):
                             models.Users.objects.create(user_code=u_code, name=name, useremail=email,
                                                         password=encrypt_password(password),
                                                         role_id=models.Role.objects.get(role_name=user_type))
+                            try:
+                                send_manually_email(subject='Registration Successfull',
+                                                    message="Dear User,\n\n"
+                                                            "Please note your email id and password to access your account.\n"
+                                                            "Email-id: " + email + "\n"
+                                                                                   "Password: " + password + ""
+                                                    , to=email)
+                            except Exception as e:
+                                print('Exception in send email', e)
+                                pass
                             return JsonResponse({'result': 'success', 'msg': 'Registered Successfully'})
                         except Exception as e:
                             models.Teacher.objects.filter(usercode=u_code).delete()
@@ -171,4 +181,54 @@ def fetch_class_details(request):
                 return JsonResponse({'result': 'success', 'cls_details': cls_details})
     except Exception as e:
         print("Exception in fetch_class_details views.py-->", e)
+        return JsonResponse({'result': 'failed', 'msg': 'Failed to load class details! Refresh the page'})
+
+
+@csrf_exempt
+def fetch_all_class_details(request):
+    try:
+        if 'usercode' in request.session:
+            if request.method == 'POST':
+                cls_details = list(
+                    models.Classes.objects.values('class_name', 'class_subject', 'class_date', 'class_time', 'class_id',
+                                                  'number_of_students'))
+                return JsonResponse({'result': 'success', 'cls_details': cls_details})
+    except Exception as e:
+        print("Exception in fetch_all_class_details views.py-->", e)
+        return JsonResponse({'result': 'failed', 'msg': 'Failed to load class details! Refresh the page'})
+
+
+@csrf_exempt
+def enroll_class(request):
+    try:
+        if 'usercode' in request.session:
+            usercode = request.session['usercode']
+            if request.method == 'POST':
+                clsId = request.POST['clsId']
+                models.ClassStudentMapping.objects.create(class_id=models.Classes.objects.get(class_id=clsId),
+                                                          student_id=models.Student.objects.get(usercode=usercode))
+                models.Classes.objects.filter(class_id=clsId).update(
+                    number_of_students=F('number_of_students') + 1)
+                return JsonResponse({'result': 'success'})
+    except Exception as e:
+        print("Exception in fetch_all_class_details views.py-->", e)
+        return JsonResponse({'result': 'failed', 'msg': 'Failed to enroll for class! Refresh the page'})
+
+
+@csrf_exempt
+def fetch_my_enrolled_classes(request):
+    try:
+        if 'usercode' in request.session:
+            usercode = request.session['usercode']
+            if request.method == 'POST':
+                student_obj = models.Student.objects.get(usercode=usercode)
+                fetch_enrolled_cls_list = list(
+                    models.ClassStudentMapping.objects.values_list('class_id', flat=True).filter(
+                        student_id=student_obj.student_id))
+                cls_details = list(
+                    models.Classes.objects.values('class_name', 'class_subject', 'class_date', 'class_time', 'class_id',
+                                                  'number_of_students').filter(class_id__in=fetch_enrolled_cls_list))
+                return JsonResponse({'result': 'success', 'cls_details': cls_details})
+    except Exception as e:
+        print("Exception in fetch_all_class_details views.py-->", e)
         return JsonResponse({'result': 'failed', 'msg': 'Failed to load class details! Refresh the page'})
