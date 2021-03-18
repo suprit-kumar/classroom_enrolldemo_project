@@ -34,6 +34,7 @@ function fetchAllClassDetails() {
                         data: {'clsId': clsId},
                         success: function (response) {
                             if (response.result === 'success') {
+                                swal("Enrolled Successfuly");
                                 fetchAllClassDetails();
                                 fetchMyEnrolledClasses();
                             } else if (response.result === 'failed') {
