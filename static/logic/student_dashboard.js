@@ -28,6 +28,7 @@ function fetchAllClassDetails() {
 
                 $('.enroll-class').click(function () {
                     const clsId = $(this).attr('id');
+                    $("#dashborad_colour").css({"background-color": "yellow"});
                     $.ajax({
                         type: 'POST',
                         url: '/enroll_class/',

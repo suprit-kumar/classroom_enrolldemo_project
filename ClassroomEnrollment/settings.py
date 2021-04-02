@@ -129,8 +129,8 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 # EMAIL_FILE_PATH = '/templates/email/'
 
 EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = 'suprit@aliceblueindia.com'
-EMAIL_HOST_PASSWORD = 'Suprit@1311'
+EMAIL_HOST_USER = ''
+EMAIL_HOST_PASSWORD = ''
 EMAIL_USE_TLS = True
 EMAIL_PORT = 587
-DEFAULT_FROM_EMAIL = 'suprit@aliceblueindia.com'
+DEFAULT_FROM_EMAIL = ''

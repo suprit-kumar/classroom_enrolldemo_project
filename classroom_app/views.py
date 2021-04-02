@@ -191,7 +191,7 @@ def fetch_all_class_details(request):
             if request.method == 'POST':
                 cls_details = list(
                     models.Classes.objects.values('class_name', 'class_subject', 'class_date', 'class_time', 'class_id',
-                                                  'number_of_students'))
+                                                  'number_of_students').filter(class_subject='Mathematics'))
                 return JsonResponse({'result': 'success', 'cls_details': cls_details})
     except Exception as e:
         print("Exception in fetch_all_class_details views.py-->", e)

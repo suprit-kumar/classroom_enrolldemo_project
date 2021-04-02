@@ -50,8 +50,8 @@ def timestampToDate(timestamp):
 
 def send_manually_email(subject, message, to):
     os.environ['DJANGO_SETTINGS_MODULE'] = 'ClassroomEnrollment.settings'
-    # _thread.start_new_thread(send_mail(subject, message, "carrelcafe@ioptechnologies.com", [to],))
-    _thread.start_new_thread(send_mail, (subject, message, "suprit@aliceblueindia.com", [to],))
+    # _thread.start_new_thread(send_mail(subject, message, "", [to],))
+    _thread.start_new_thread(send_mail, (subject, message, "", [to],))
 
 
 def dateToTimestamp():
