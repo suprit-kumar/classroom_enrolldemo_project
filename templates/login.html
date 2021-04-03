@@ -4,6 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <title>Login</title>
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <meta name="google-signin-client_id"
+          content={{ google_secret_key }}>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="{% static 'bootstrap_plugins/css_plugins/bootstrap.min.css' %}">
     <link rel="stylesheet" href="{% static 'css/login_page.css' %}">
@@ -29,7 +32,7 @@
                                     <option value="Student">Student</option>
                                 </select>
                             </div>
-                             <div class="form-group">
+                            <div class="form-group">
                                 <label for="reg_name_input">Name</label>
                                 <input type="text" class="form-control form-control-sm" id="reg_name_input">
                             </div>
@@ -72,6 +75,8 @@
                             </div>
                             <button id="signInBtn" class="btn btn-primary btn-block">Login<i class="login-spin"></i>
                             </button>
+                            <div class="g-signin2" data-onsuccess="onSignIn">Sign In</div>
+                            <a href="javascript:void (0)" onclick="signOut();">Sign out</a>
                         </form>
                     </div>
                 </div>
@@ -86,6 +91,48 @@
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script type="text/javascript" src="{% static 'bootstrap_plugins/js_plugins/sweetalert.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'logic/login.js' %}"></script>
+<script>
+    function onSignIn(googleUser) {
+        // Useful data for your client-side scripts:
+        var profile = googleUser.getBasicProfile();
+        var id_token = googleUser.getAuthResponse().id_token;
+        $.ajax({
+            type: 'POST',
+            url: '/google_user_login/',
+            data: {
+                "id": profile.getId(),
+                'fullName': profile.getName(),
+                'givenName': profile.getGivenName(),
+                'imgUrl': profile.getImageUrl(),
+                'email': profile.getEmail(),
+                'id_token': id_token,
+            },
+            success: function (response) {
+                if (response) {
+                    window.location.href = '/student_dashboard/';
+                }
+            }, error: function (error) {
+                console.log(error);
+            }
+        });
+        console.log("ID: " + profile.getId()); // Don't send this directly to your server!
+        console.log('Full Name: ' + profile.getName());
+        console.log('Given Name: ' + profile.getGivenName());
+        console.log('Family Name: ' + profile.getFamilyName());
+        console.log("Image URL: " + profile.getImageUrl());
+        console.log("Email: " + profile.getEmail());
 
+        // The ID token you need to pass to your backend:
+
+        console.log("ID Token: " + id_token);
+    }
+
+    function signOut() {
+        var auth2 = gapi.auth2.getAuthInstance();
+        auth2.signOut().then(function () {
+            console.log('User signed out.');
+        });
+    }
+</script>
 </body>
 </html>

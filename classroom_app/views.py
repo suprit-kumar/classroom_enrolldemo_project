@@ -6,6 +6,8 @@ from django.db.models import F
 from classroom_app import models
 from classroom_app.utils import *
 import razorpay
+from google.oauth2 import id_token
+from google.auth.transport import requests
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -13,7 +15,7 @@ load_dotenv()
 
 # Create your views here.
 def loginHtml(request):
-    return render(request, 'login.html')
+    return render(request, 'login.html', {'google_secret_key': os.getenv('google_secret')})
 
 
 @csrf_exempt
@@ -41,6 +43,44 @@ def login_operation(request):
     except Exception as e:
         print("Exception in login_operation views.py-->", e)
         return JsonResponse({"result": "error", "msg": "Opps!, Server error while login"})
+
+
+@csrf_exempt
+def google_user_login(request):
+    try:
+        if request.method == 'POST':
+            id = request.POST['id']
+            fullName = request.POST['fullName']
+            givenName = request.POST['givenName']
+            imgUrl = request.POST['imgUrl']
+            email = request.POST['email']
+            token = request.POST['id_token']
+            idinfo = id_token.verify_oauth2_token(token, requests.Request(), os.getenv('google_secret'))
+            print('idinfo -->', idinfo)
+            check_email_exist = models.Users.objects.filter(useremail=email).exists()
+            if check_email_exist is False:
+                u_code = getUniqueUserCode()
+                models.Student.objects.create(usercode=u_code, student_name=fullName,
+                                              student_email=email)
+
+                models.Users.objects.create(user_code=u_code, name=fullName, useremail=email,
+                                            role_id=models.Role.objects.get(role_name='Student'))
+                validate_user = models.Users.objects.get(useremail=email,
+                                                         status__iexact='active')
+                request.session['usercode'] = validate_user.user_code
+                response_msg = {"result": "success", 'u_type': validate_user.role_id.role_name,
+                                'u_code': validate_user.user_code}
+                return JsonResponse(response_msg)
+
+            else:
+                validate_user = models.Users.objects.get(useremail=email,
+                                                         status__iexact='active')
+                request.session['usercode'] = validate_user.user_code
+                response_msg = {"result": "success", 'u_type': validate_user.role_id.role_name,
+                                'u_code': validate_user.user_code}
+                return JsonResponse(response_msg)
+    except Exception as e:
+        print('Exception in google_login function -->', e)
 
 
 def logout(request):

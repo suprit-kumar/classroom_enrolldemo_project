@@ -7,9 +7,9 @@ class Transactions(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100)
     amount = models.CharField(max_length=100)
-    order_id = models.CharField(max_length=100,null=True)
-    payment_id = models.CharField(max_length=100,null=True)
-    signature = models.CharField(max_length=250,null=True)
+    order_id = models.CharField(max_length=100, null=True)
+    payment_id = models.CharField(max_length=100, null=True)
+    signature = models.CharField(max_length=250, null=True)
     paid = models.BooleanField(default=False)
 
     class Meta:
@@ -97,6 +97,7 @@ class Users(models.Model):
     password = models.CharField(max_length=100, null=True, default="")
     role_id = models.ForeignKey(Role, on_delete=models.CASCADE)
     status = models.CharField(max_length=50, null=True, default="active")
+    google_token_id = models.CharField(max_length=100, null=True, default="")
     user_created_time = models.DateTimeField(auto_now_add=True, blank=True)
 
     class Meta:
