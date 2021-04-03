@@ -1,6 +1,21 @@
 from django.db import models
 
+
 # Create your models here.
+
+class Transactions(models.Model):
+    id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=100)
+    amount = models.CharField(max_length=100)
+    payment_id = models.CharField(max_length=100)
+    paid = models.BooleanField(default=False)
+
+    class Meta:
+        db_table = "transactions"
+
+    def __unicode__(self):
+        return u'%s' % [self.id]
+
 
 class Teacher(models.Model):
     teacher_id = models.AutoField(primary_key=True)
@@ -45,6 +60,7 @@ class Classes(models.Model):
     def __unicode__(self):
         return u'%s' % [self.class_id]
 
+
 class ClassStudentMapping(models.Model):
     cls_student_map_id = models.AutoField(primary_key=True)
     class_id = models.ForeignKey(Classes, on_delete=models.CASCADE)
@@ -58,7 +74,6 @@ class ClassStudentMapping(models.Model):
         return u'%s' % [self.class_id]
 
 
-
 class Role(models.Model):
     role_id = models.AutoField(primary_key=True)
     role_name = models.CharField(max_length=50, null=True, default="")
@@ -70,6 +85,7 @@ class Role(models.Model):
 
     def __unicode__(self):
         return u'%s' % [self.role_id]
+
 
 class Users(models.Model):
     u_id = models.AutoField(primary_key=True)

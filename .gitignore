@@ -1,6 +1,7 @@
 .idea
 *.log
 *.pyc
+*.env
 workspace.xml
 classroom_app/__pycache__/*
 ClassroomEnrollment/__pycache__/*

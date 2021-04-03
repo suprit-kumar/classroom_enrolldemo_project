@@ -5,6 +5,10 @@ import re
 from django.db.models import F
 from classroom_app import models
 from classroom_app.utils import *
+import razorpay
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 # Create your views here.
@@ -76,7 +80,21 @@ def teacher_dashboard(request):
             return render(request, 'teacher_dashboard.html',
                           {'user_code': user_code, 'details': user_details, 'type': 'TEACHER'})
     except Exception as e:
-        print('Exception in rendering admin_dashboard --> ', e)
+        print('Exception in rendering teacher_dashboard --> ', e)
+        request.session.flush()
+        return HttpResponseRedirect('/')
+
+
+def payment_page(request):
+    try:
+        if 'usercode' in request.session:
+            user_code = request.session['usercode']
+            user_details = list(
+                models.Users.objects.filter(user_code=user_code).values('name', 'useremail'))
+            return render(request, 'payment.html',
+                          {'user_code': user_code, 'details': user_details, 'type': 'TEACHER'})
+    except Exception as e:
+        print('Exception in rendering payment page --> ', e)
         request.session.flush()
         return HttpResponseRedirect('/')
 
@@ -232,3 +250,20 @@ def fetch_my_enrolled_classes(request):
     except Exception as e:
         print("Exception in fetch_all_class_details views.py-->", e)
         return JsonResponse({'result': 'failed', 'msg': 'Failed to load class details! Refresh the page'})
+
+
+@csrf_exempt
+def generate_payment_order(request):
+    try:
+        if request.method == 'POST':
+            itemName = request.POST['itemName']
+            itemPrice = request.POST['itemPrice']
+            client = razorpay.Client(auth=(os.getenv('razorpay_publickey'), os.getenv('razorpay_secretkey')))
+            my_payment = client.order.create(
+                {'amount': int(itemPrice) * 100, 'currency': 'INR', 'payment_capture': '1'})
+
+            models.Transactions.objects.create(name=itemName, amount=itemPrice, payment_id=my_payment['id'])
+            return JsonResponse({'my_payment': my_payment, 'amount': itemPrice, 'itemName': itemName})
+    except Exception as e:
+        print("Exception in generate_payment_order views.py-->", e)
+        return JsonResponse({'result': 'failed', 'msg': 'Internal server error'})

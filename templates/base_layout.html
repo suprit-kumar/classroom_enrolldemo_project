@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>Dashboard</title>
     <meta name="description" content="">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="all,follow">
     <!-- Bootstrap CSS-->
     <link rel="stylesheet" href="{% static 'dashboardStyles/vendor/bootstrap/css/bootstrap.min.css' %}">
@@ -43,6 +43,7 @@
             <h5 class="sidenav-heading">Menu</h5>
             <ul id="side-main-menu" class="side-menu list-unstyled">
                 <li><a href="javascript:void(0)">Home </a></li>
+                <li><a href="{% url 'payment_page' %}">Payement </a></li>
                 <li><a href="{% url 'logout' %}">Logout </a></li>
             </ul>
         </div>

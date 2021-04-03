@@ -22,6 +22,7 @@ urlpatterns = [
     path('', views.loginHtml, name='loginHtml'),
     path('admin_dashboard/', views.admin_dashboard, name='admin_dashboard'),
     path('teacher_dashboard/', views.teacher_dashboard, name='teacher_dashboard'),
+    path('payment_page/', views.payment_page, name='payment_page'),
     path('student_dashboard/', views.student_dashboard, name='student_dashboard'),
     path('login_operation/', views.login_operation, name='login_operation'),
     path('logout/', views.logout, name='logout'),
@@ -31,4 +32,5 @@ urlpatterns = [
     path('fetch_all_class_details/', views.fetch_all_class_details, name='fetch_all_class_details'),
     path('enroll_class/', views.enroll_class, name='enroll_class'),
     path('fetch_my_enrolled_classes/', views.fetch_my_enrolled_classes, name='fetch_my_enrolled_classes'),
+    path('generate_payment_order/', views.generate_payment_order, name='generate_payment_order'),
 ]
