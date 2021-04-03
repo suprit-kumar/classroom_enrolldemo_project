@@ -261,7 +261,6 @@ def generate_payment_order(request):
             client = razorpay.Client(auth=(os.getenv('razorpay_publickey'), os.getenv('razorpay_secretkey')))
             myorder = client.order.create(
                 {'amount': int(itemPrice) * 100, 'currency': 'INR', 'payment_capture': '1'})
-            print(myorder)
             models.Transactions.objects.create(name=itemName, amount=itemPrice, order_id=myorder['id'])
             return JsonResponse({'my_payment': myorder, 'amount': itemPrice, 'itemName': itemName})
     except Exception as e:
@@ -275,10 +274,6 @@ def update_transaction_db(request):
         razorpay_payment_id = request.POST['razorpay_payment_id']
         razorpay_order_id = request.POST['razorpay_order_id']
         razorpay_signature = request.POST['razorpay_signature']
-
-        print('razorpay_payment_id -', razorpay_payment_id)
-        print('razorpay_order_id -', razorpay_order_id)
-        print('razorpay_signature -', razorpay_signature)
 
         models.Transactions.objects.filter(order_id=razorpay_order_id).update(order_id=razorpay_order_id,
                                                                               payment_id=razorpay_payment_id,
