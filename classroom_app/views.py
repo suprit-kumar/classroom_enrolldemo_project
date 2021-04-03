@@ -259,11 +259,29 @@ def generate_payment_order(request):
             itemName = request.POST['itemName']
             itemPrice = request.POST['itemPrice']
             client = razorpay.Client(auth=(os.getenv('razorpay_publickey'), os.getenv('razorpay_secretkey')))
-            my_payment = client.order.create(
+            myorder = client.order.create(
                 {'amount': int(itemPrice) * 100, 'currency': 'INR', 'payment_capture': '1'})
-
-            models.Transactions.objects.create(name=itemName, amount=itemPrice, payment_id=my_payment['id'])
-            return JsonResponse({'my_payment': my_payment, 'amount': itemPrice, 'itemName': itemName})
+            print(myorder)
+            models.Transactions.objects.create(name=itemName, amount=itemPrice, order_id=myorder['id'])
+            return JsonResponse({'my_payment': myorder, 'amount': itemPrice, 'itemName': itemName})
     except Exception as e:
         print("Exception in generate_payment_order views.py-->", e)
         return JsonResponse({'result': 'failed', 'msg': 'Internal server error'})
+
+
+@csrf_exempt
+def update_transaction_db(request):
+    if request.method == 'POST':
+        razorpay_payment_id = request.POST['razorpay_payment_id']
+        razorpay_order_id = request.POST['razorpay_order_id']
+        razorpay_signature = request.POST['razorpay_signature']
+
+        print('razorpay_payment_id -', razorpay_payment_id)
+        print('razorpay_order_id -', razorpay_order_id)
+        print('razorpay_signature -', razorpay_signature)
+
+        models.Transactions.objects.filter(order_id=razorpay_order_id).update(order_id=razorpay_order_id,
+                                                                              payment_id=razorpay_payment_id,
+                                                                              signature=razorpay_signature, paid=True)
+
+        return JsonResponse({'result': 'success'})

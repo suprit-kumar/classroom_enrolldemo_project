@@ -33,4 +33,5 @@ urlpatterns = [
     path('enroll_class/', views.enroll_class, name='enroll_class'),
     path('fetch_my_enrolled_classes/', views.fetch_my_enrolled_classes, name='fetch_my_enrolled_classes'),
     path('generate_payment_order/', views.generate_payment_order, name='generate_payment_order'),
+    path('update_transaction_db/', views.update_transaction_db, name='update_transaction_db'),
 ]
