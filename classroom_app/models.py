@@ -16,7 +16,7 @@ class Transactions(models.Model):
         db_table = "transactions"
 
     def __unicode__(self):
-        return u'%s' % [self.id]
+        return f'{[self.id]}'
 
 
 class Teacher(models.Model):
@@ -30,7 +30,7 @@ class Teacher(models.Model):
         db_table = "teacher"
 
     def __unicode__(self):
-        return u'%s' % [self.teacher_id]
+        return f'{[self.teacher_id]}'
 
 
 class Student(models.Model):
@@ -44,7 +44,7 @@ class Student(models.Model):
         db_table = "student"
 
     def __unicode__(self):
-        return u'%s' % [self.student_id]
+        return f'{[self.student_id]}'
 
 
 class Classes(models.Model):
@@ -60,7 +60,7 @@ class Classes(models.Model):
         db_table = "classes"
 
     def __unicode__(self):
-        return u'%s' % [self.class_id]
+        return f'{[self.class_id]}'
 
 
 class ClassStudentMapping(models.Model):
@@ -73,7 +73,7 @@ class ClassStudentMapping(models.Model):
         db_table = "classroom"
 
     def __unicode__(self):
-        return u'%s' % [self.class_id]
+        return f'{[self.class_id]}'
 
 
 class Role(models.Model):
@@ -86,7 +86,7 @@ class Role(models.Model):
         db_table = "role"
 
     def __unicode__(self):
-        return u'%s' % [self.role_id]
+        return f'{[self.role_id]}'
 
 
 class Users(models.Model):
@@ -104,4 +104,4 @@ class Users(models.Model):
         db_table = "users"
 
     def __unicode__(self):
-        return u'%s' % [self.u_id]
+        return f'{[self.u_id]}'

@@ -23,8 +23,9 @@ def login_operation(request):
     try:
         useremail = request.POST.get('useremail')
         password = request.POST.get('password')
-        u_name = re.search(r'\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b', useremail, re.I)
-        if u_name:
+        if u_name := re.search(
+            r'\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b', useremail, re.I
+        ):
             try:
                 validate_user = models.Users.objects.get(useremail=useremail,
                                                          password=encrypt_password(password),
@@ -65,20 +66,13 @@ def google_user_login(request):
 
                 models.Users.objects.create(user_code=u_code, name=fullName, useremail=email,
                                             role_id=models.Role.objects.get(role_name='Student'))
-                validate_user = models.Users.objects.get(useremail=email,
-                                                         status__iexact='active')
-                request.session['usercode'] = validate_user.user_code
-                response_msg = {"result": "success", 'u_type': validate_user.role_id.role_name,
-                                'u_code': validate_user.user_code}
-                return JsonResponse(response_msg)
+            validate_user = models.Users.objects.get(useremail=email,
+                                                     status__iexact='active')
+            request.session['usercode'] = validate_user.user_code
+            response_msg = {"result": "success", 'u_type': validate_user.role_id.role_name,
+                            'u_code': validate_user.user_code}
+            return JsonResponse(response_msg)
 
-            else:
-                validate_user = models.Users.objects.get(useremail=email,
-                                                         status__iexact='active')
-                request.session['usercode'] = validate_user.user_code
-                response_msg = {"result": "success", 'u_type': validate_user.role_id.role_name,
-                                'u_code': validate_user.user_code}
-                return JsonResponse(response_msg)
     except Exception as e:
         print('Exception in google_login function -->', e)
 
@@ -162,42 +156,43 @@ def register_new_user(request):
             email = request.POST['email']
             password = request.POST['password']
 
-            if user_type != '' and name != '' and email != '' and password != '':
-                check_email_exist = models.Users.objects.filter(useremail=email).exists()
-                if check_email_exist is False:
-                    u_code = getUniqueUserCode()
-                    if user_type == 'Teacher':
-                        save_details = models.Teacher.objects.create(usercode=u_code, teacher_name=name,
-                                                                     teacher_email=email)
-                    else:
-                        save_details = models.Student.objects.create(usercode=u_code, student_name=name,
-                                                                     student_email=email)
-                    if save_details is not None:
-                        try:
-                            models.Users.objects.create(user_code=u_code, name=name, useremail=email,
-                                                        password=encrypt_password(password),
-                                                        role_id=models.Role.objects.get(role_name=user_type))
-                            try:
-                                send_manually_email(subject='Registration Successfull',
-                                                    message="Dear User,\n\n"
-                                                            "Please note your email id and password to access your account.\n"
-                                                            "Email-id: " + email + "\n"
-                                                                                   "Password: " + password + ""
-                                                    , to=email)
-                            except Exception as e:
-                                print('Exception in send email', e)
-                                pass
-                            return JsonResponse({'result': 'success', 'msg': 'Registered Successfully'})
-                        except Exception as e:
-                            models.Teacher.objects.filter(usercode=u_code).delete()
-                            models.Student.objects.filter(usercode=u_code).delete()
-                            print("Exception in user creation -->", e)
-                else:
-                    return JsonResponse(
-                        {'result': 'email_exist', 'msg': 'This email id already registered! Try with another'})
-            else:
+            if user_type == '' or name == '' or email == '' or password == '':
                 return JsonResponse({'result': 'invalid_request', 'msg': 'Invalid request! Try again'})
 
+            check_email_exist = models.Users.objects.filter(useremail=email).exists()
+            if check_email_exist is not False:
+                return JsonResponse(
+                    {'result': 'email_exist', 'msg': 'This email id already registered! Try with another'})
+            u_code = getUniqueUserCode()
+            save_details = (
+                models.Teacher.objects.create(
+                    usercode=u_code, teacher_name=name, teacher_email=email
+                )
+                if user_type == 'Teacher'
+                else models.Student.objects.create(
+                    usercode=u_code, student_name=name, student_email=email
+                )
+            )
+
+            if save_details is not None:
+                try:
+                    models.Users.objects.create(user_code=u_code, name=name, useremail=email,
+                                                password=encrypt_password(password),
+                                                role_id=models.Role.objects.get(role_name=user_type))
+                    try:
+                        send_manually_email(subject='Registration Successfull',
+                                            message="Dear User,\n\n"
+                                                    "Please note your email id and password to access your account.\n"
+                                                    "Email-id: " + email + "\n"
+                                                                           "Password: " + password + ""
+                                            , to=email)
+                    except Exception as e:
+                        print('Exception in send email', e)
+                    return JsonResponse({'result': 'success', 'msg': 'Registered Successfully'})
+                except Exception as e:
+                    models.Teacher.objects.filter(usercode=u_code).delete()
+                    models.Student.objects.filter(usercode=u_code).delete()
+                    print("Exception in user creation -->", e)
     except Exception as e:
         print("Exception in register_new_user views.py-->", e)
         return JsonResponse({'result': 'failed', 'msg': 'Failed to register! Try after sometimes'})
@@ -206,21 +201,20 @@ def register_new_user(request):
 @csrf_exempt
 def save_class_details(request):
     try:
-        if 'usercode' in request.session:
-            usercode = request.session['usercode']
-            if request.method == 'POST':
-                className = request.POST['className']
-                classSubject = request.POST['classSubject']
-                classDate = request.POST['classDate']
-                classTime = request.POST['classTime']
+        if 'usercode' in request.session and request.method == 'POST':
+            className = request.POST['className']
+            classSubject = request.POST['classSubject']
+            classDate = request.POST['classDate']
+            classTime = request.POST['classTime']
 
-                if className != '' and classSubject != '' and classDate != '' and classTime != '':
-                    models.Classes.objects.create(class_name=className, class_subject=classSubject,
-                                                  class_date=classDate, class_time=classTime,
-                                                  teacher_id=models.Teacher.objects.get(usercode=usercode))
-                    return JsonResponse({'result': 'success', 'msg': 'Class Created Successfully'})
-                else:
-                    return JsonResponse({'result': 'invalid_request', 'msg': 'Invalid request! Try again'})
+            if className != '' and classSubject != '' and classDate != '' and classTime != '':
+                usercode = request.session['usercode']
+                models.Classes.objects.create(class_name=className, class_subject=classSubject,
+                                              class_date=classDate, class_time=classTime,
+                                              teacher_id=models.Teacher.objects.get(usercode=usercode))
+                return JsonResponse({'result': 'success', 'msg': 'Class Created Successfully'})
+            else:
+                return JsonResponse({'result': 'invalid_request', 'msg': 'Invalid request! Try again'})
     except Exception as e:
         print("Exception in save_class_details views.py-->", e)
         return JsonResponse({'result': 'failed', 'msg': 'Failed to save class details! Try after sometimes'})
@@ -229,14 +223,13 @@ def save_class_details(request):
 @csrf_exempt
 def fetch_class_details(request):
     try:
-        if 'usercode' in request.session:
+        if 'usercode' in request.session and request.method == 'POST':
             usercode = request.session['usercode']
-            if request.method == 'POST':
-                teacher_obj = models.Teacher.objects.get(usercode=usercode)
-                cls_details = list(
-                    models.Classes.objects.values('class_name', 'class_subject', 'class_date', 'class_time',
-                                                  'number_of_students').filter(teacher_id=teacher_obj.teacher_id))
-                return JsonResponse({'result': 'success', 'cls_details': cls_details})
+            teacher_obj = models.Teacher.objects.get(usercode=usercode)
+            cls_details = list(
+                models.Classes.objects.values('class_name', 'class_subject', 'class_date', 'class_time',
+                                              'number_of_students').filter(teacher_id=teacher_obj.teacher_id))
+            return JsonResponse({'result': 'success', 'cls_details': cls_details})
     except Exception as e:
         print("Exception in fetch_class_details views.py-->", e)
         return JsonResponse({'result': 'failed', 'msg': 'Failed to load class details! Refresh the page'})
@@ -245,12 +238,11 @@ def fetch_class_details(request):
 @csrf_exempt
 def fetch_all_class_details(request):
     try:
-        if 'usercode' in request.session:
-            if request.method == 'POST':
-                cls_details = list(
-                    models.Classes.objects.values('class_name', 'class_subject', 'class_date', 'class_time', 'class_id',
-                                                  'number_of_students').filter(class_subject='Mathematics'))
-                return JsonResponse({'result': 'success', 'cls_details': cls_details})
+        if 'usercode' in request.session and request.method == 'POST':
+            cls_details = list(
+                models.Classes.objects.values('class_name', 'class_subject', 'class_date', 'class_time', 'class_id',
+                                              'number_of_students').filter(class_subject='Mathematics'))
+            return JsonResponse({'result': 'success', 'cls_details': cls_details})
     except Exception as e:
         print("Exception in fetch_all_class_details views.py-->", e)
         return JsonResponse({'result': 'failed', 'msg': 'Failed to load class details! Refresh the page'})
@@ -259,15 +251,14 @@ def fetch_all_class_details(request):
 @csrf_exempt
 def enroll_class(request):
     try:
-        if 'usercode' in request.session:
+        if 'usercode' in request.session and request.method == 'POST':
+            clsId = request.POST['clsId']
             usercode = request.session['usercode']
-            if request.method == 'POST':
-                clsId = request.POST['clsId']
-                models.ClassStudentMapping.objects.create(class_id=models.Classes.objects.get(class_id=clsId),
-                                                          student_id=models.Student.objects.get(usercode=usercode))
-                models.Classes.objects.filter(class_id=clsId).update(
-                    number_of_students=F('number_of_students') + 1)
-                return JsonResponse({'result': 'success'})
+            models.ClassStudentMapping.objects.create(class_id=models.Classes.objects.get(class_id=clsId),
+                                                      student_id=models.Student.objects.get(usercode=usercode))
+            models.Classes.objects.filter(class_id=clsId).update(
+                number_of_students=F('number_of_students') + 1)
+            return JsonResponse({'result': 'success'})
     except Exception as e:
         print("Exception in fetch_all_class_details views.py-->", e)
         return JsonResponse({'result': 'failed', 'msg': 'Failed to enroll for class! Refresh the page'})
@@ -276,17 +267,16 @@ def enroll_class(request):
 @csrf_exempt
 def fetch_my_enrolled_classes(request):
     try:
-        if 'usercode' in request.session:
+        if 'usercode' in request.session and request.method == 'POST':
             usercode = request.session['usercode']
-            if request.method == 'POST':
-                student_obj = models.Student.objects.get(usercode=usercode)
-                fetch_enrolled_cls_list = list(
-                    models.ClassStudentMapping.objects.values_list('class_id', flat=True).filter(
-                        student_id=student_obj.student_id))
-                cls_details = list(
-                    models.Classes.objects.values('class_name', 'class_subject', 'class_date', 'class_time', 'class_id',
-                                                  'number_of_students').filter(class_id__in=fetch_enrolled_cls_list))
-                return JsonResponse({'result': 'success', 'cls_details': cls_details})
+            student_obj = models.Student.objects.get(usercode=usercode)
+            fetch_enrolled_cls_list = list(
+                models.ClassStudentMapping.objects.values_list('class_id', flat=True).filter(
+                    student_id=student_obj.student_id))
+            cls_details = list(
+                models.Classes.objects.values('class_name', 'class_subject', 'class_date', 'class_time', 'class_id',
+                                              'number_of_students').filter(class_id__in=fetch_enrolled_cls_list))
+            return JsonResponse({'result': 'success', 'cls_details': cls_details})
     except Exception as e:
         print("Exception in fetch_all_class_details views.py-->", e)
         return JsonResponse({'result': 'failed', 'msg': 'Failed to load class details! Refresh the page'})
